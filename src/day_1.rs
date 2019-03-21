@@ -12,14 +12,10 @@ mod part_1 {
         let mut sum = 0;
         let characters: Vec<char> = input.chars().collect();
 
-        for i in 0..characters.len() - 1 {
-            if characters[i] == characters[i + 1] {
+        for i in 0..characters.len() {
+            if characters[i] == characters[if i == characters.len() - 1 { 0 } else { i + 1 }] {
                 sum += characters[i].to_digit(10).unwrap();
             }
-        }
-
-        if characters[characters.len() - 1] == characters[0] {
-            sum += characters[characters.len() - 1].to_digit(10).unwrap();
         }
 
         sum
