@@ -3,6 +3,7 @@ use super::print_day;
 pub fn solve(input: &str) {
     print_day!(file!());
     println!("Part 1: {}.", part_1::solve(&input));
+    println!("Part 2: {}.", part_2::solve(&input));
     println!();
 }
 
@@ -43,5 +44,46 @@ mod part_1 {
     #[test]
     fn test_4() {
         assert_eq!(solve("91212129"), 9);
+    }
+}
+
+mod part_2 {
+    pub fn solve(input: &str) -> u32 {
+        let mut sum = 0;
+        let characters: Vec<char> = input.chars().collect();
+
+        for i in 0..characters.len() {
+            if characters[i] == characters[(i + characters.len() / 2) % characters.len()] {
+                sum += characters[i].to_digit(10).unwrap();
+            }
+        }
+
+        sum
+    }
+
+    #[cfg(test)]
+    #[test]
+    fn test_1() {
+        assert_eq!(solve("1212"), 6);
+    }
+
+    #[test]
+    fn test_2() {
+        assert_eq!(solve("1221"), 0);
+    }
+
+    #[test]
+    fn test_3() {
+        assert_eq!(solve("123425"), 4);
+    }
+
+    #[test]
+    fn test_4() {
+        assert_eq!(solve("123123"), 12);
+    }
+
+    #[test]
+    fn test_5() {
+        assert_eq!(solve("12131415"), 4);
     }
 }
