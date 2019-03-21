@@ -9,16 +9,15 @@ pub fn solve(input: &str) {
 
 mod part_1 {
     pub fn solve(input: &str) -> u32 {
-        let mut sum = 0;
         let characters: Vec<char> = input.chars().collect();
 
-        for i in 0..characters.len() {
+        (0..characters.len()).fold(0, |sum, i| {
             if characters[i] == characters[if i == characters.len() - 1 { 0 } else { i + 1 }] {
-                sum += characters[i].to_digit(10).unwrap();
+                sum + characters[i].to_digit(10).unwrap()
+            } else {
+                sum
             }
-        }
-
-        sum
+        })
     }
 
     #[cfg(test)]
@@ -45,16 +44,15 @@ mod part_1 {
 
 mod part_2 {
     pub fn solve(input: &str) -> u32 {
-        let mut sum = 0;
         let characters: Vec<char> = input.chars().collect();
 
-        for i in 0..characters.len() {
+        (0..characters.len()).fold(0, |sum, i| {
             if characters[i] == characters[(i + characters.len() / 2) % characters.len()] {
-                sum += characters[i].to_digit(10).unwrap();
+                sum + characters[i].to_digit(10).unwrap()
+            } else {
+                sum
             }
-        }
-
-        sum
+        })
     }
 
     #[cfg(test)]
