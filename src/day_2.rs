@@ -12,15 +12,13 @@ mod part_1 {
         input
             .lines()
             .map(|line| {
-                line.split_whitespace()
+                let mut numbers: Vec<usize> = line
+                    .split_whitespace()
                     .map(|slice| slice.parse::<usize>().unwrap())
-                    .max()
-                    .unwrap()
-                    - line
-                        .split_whitespace()
-                        .map(|slice| slice.parse::<usize>().unwrap())
-                        .min()
-                        .unwrap()
+                    .collect();
+
+                numbers.sort();
+                numbers[numbers.len() - 1] - numbers[0]
             })
             .sum()
     }
