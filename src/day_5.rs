@@ -17,17 +17,13 @@ mod part_1 {
         let mut pc = 0;
         let mut steps = 0;
 
-        loop {
-            let new_pc = pc + jumps[pc as usize];
+        while let Some(jump) = jumps.get_mut(pc as usize) {
+            pc += *jump;
+            *jump += 1;
             steps += 1;
-
-            if new_pc >= jumps.len() as isize {
-                return steps;
-            }
-
-            jumps[pc as usize] += 1;
-            pc = new_pc;
         }
+
+        steps
     }
 
     #[cfg(test)]
@@ -53,22 +49,19 @@ mod part_2 {
         let mut pc = 0;
         let mut steps = 0;
 
-        loop {
-            let new_pc = pc + jumps[pc as usize];
-            steps += 1;
+        while let Some(jump) = jumps.get_mut(pc as usize) {
+            pc += *jump;
 
-            if new_pc >= jumps.len() as isize {
-                return steps;
-            }
-
-            if jumps[pc as usize] >= 3 {
-                jumps[pc as usize] -= 1;
+            if *jump >= 3 {
+                *jump -= 1;
             } else {
-                jumps[pc as usize] += 1;
+                *jump += 1;
             }
 
-            pc = new_pc;
+            steps += 1;
         }
+
+        steps
     }
 
     #[cfg(test)]
