@@ -3,6 +3,7 @@ use super::print_day;
 pub fn solve(input: &str) {
     print_day!(file!());
     println!("Part 1: {}.", part_1::solve(&input));
+    println!("Part 2: {}.", part_2::solve(&input));
     println!();
 }
 
@@ -107,5 +108,65 @@ mod part_1 {
     #[test]
     fn test_15() {
         assert_eq!(solve("{{<a!>},{<a!>},{<a!>},{<ab>}}"), 3);
+    }
+}
+
+mod part_2 {
+    pub fn solve(input: &str) -> usize {
+        let mut characters = input.chars();
+        let mut characters_inside_garbage = 0;
+        let mut garbage = false;
+
+        while let Some(character) = characters.next() {
+            if character == '!' {
+                characters.next();
+            } else if garbage {
+                if character == '>' {
+                    garbage = false;
+                } else {
+                    characters_inside_garbage += 1;
+                }
+            } else if character == '<' {
+                garbage = true;
+            }
+        }
+
+        characters_inside_garbage
+    }
+
+    #[cfg(test)]
+    #[test]
+    fn test_1() {
+        assert_eq!(solve("<>"), 0);
+    }
+
+    #[test]
+    fn test_2() {
+        assert_eq!(solve("<random characters>"), 17);
+    }
+
+    #[test]
+    fn test_3() {
+        assert_eq!(solve("<<<<>"), 3);
+    }
+
+    #[test]
+    fn test_4() {
+        assert_eq!(solve("<{!>}>"), 2);
+    }
+
+    #[test]
+    fn test_5() {
+        assert_eq!(solve("<!!>"), 0);
+    }
+
+    #[test]
+    fn test_6() {
+        assert_eq!(solve("<!!!>>"), 0);
+    }
+
+    #[test]
+    fn test_7() {
+        assert_eq!(solve(r#"<{o"i!a,<{i<a>"#), 10);
     }
 }
