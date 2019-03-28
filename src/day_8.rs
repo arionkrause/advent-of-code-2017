@@ -4,6 +4,7 @@ use regex::Regex;
 pub fn solve(input: &str) {
     print_day!(file!());
     println!("Part 1: {}.", part_1::solve(&input));
+    println!("Part 2: {}.", part_2::solve(&input));
     println!();
 }
 
@@ -143,5 +144,70 @@ c dec -10 if a >= 1
 c inc -20 if c == 10";
 
         assert_eq!(solve(input), 1);
+    }
+}
+
+mod part_2 {
+    use crate::day_8::{decode_input, Condition, Operation};
+    use std::collections::HashMap;
+
+    pub fn solve(input: &str) -> isize {
+        let mut registers = HashMap::new();
+        let mut highest_value_ever_held = None;
+
+        decode_input(&input).into_iter().for_each(|instruction| {
+            let value_condition_operand_a = *registers
+                .entry(instruction.condition_operand_a)
+                .or_insert(0);
+
+            if match instruction.condition {
+                Condition::Different => {
+                    value_condition_operand_a != instruction.condition_operand_b
+                }
+                Condition::Equal => value_condition_operand_a == instruction.condition_operand_b,
+                Condition::Greater => value_condition_operand_a > instruction.condition_operand_b,
+                Condition::GreaterOrEqual => {
+                    value_condition_operand_a >= instruction.condition_operand_b
+                }
+                Condition::Less => value_condition_operand_a < instruction.condition_operand_b,
+                Condition::LessOrEqual => {
+                    value_condition_operand_a <= instruction.condition_operand_b
+                }
+            } {
+                let value_operation_operand_a = registers
+                    .entry(instruction.operation_operand_a)
+                    .or_insert(0);
+
+                match instruction.operation {
+                    Operation::Decrease => {
+                        *value_operation_operand_a -= instruction.operation_operand_b
+                    }
+                    Operation::Increase => {
+                        *value_operation_operand_a += instruction.operation_operand_b
+                    }
+                }
+
+                let largest_value = *registers.values().max().unwrap();
+
+                if highest_value_ever_held.is_none()
+                    || largest_value > highest_value_ever_held.unwrap()
+                {
+                    highest_value_ever_held = Some(largest_value);
+                }
+            }
+        });
+
+        highest_value_ever_held.unwrap()
+    }
+
+    #[cfg(test)]
+    #[test]
+    fn test_1() {
+        let input = "b inc 5 if a > 1
+a inc 1 if b < 5
+c dec -10 if a >= 1
+c inc -20 if c == 10";
+
+        assert_eq!(solve(input), 10);
     }
 }
