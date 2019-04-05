@@ -64,13 +64,14 @@ mod part_1 {
 mod part_2 {
     use crate::day_12::decode_input;
     use std::collections::HashSet;
+    use std::hash::Hash;
 
     pub fn solve(input: &str) -> usize {
         let pipes = decode_input(&input);
-        let mut pending: Vec<usize> = (0..pipes.len()).collect();
+        let mut pending: HashSet<usize> = (0..pipes.len()).collect();
         let mut amount_groups = 0;
 
-        while let Some(pending_program) = pending.pop() {
+        while let Some(pending_program) = take_arbitrary(&mut pending) {
             let mut queue = vec![pending_program];
             let mut seem = HashSet::new();
 
@@ -80,12 +81,7 @@ mod part_2 {
                 for connected_program in pipes[program].iter() {
                     if !queue.contains(connected_program) && !seem.contains(connected_program) {
                         queue.push(*connected_program);
-                        pending.remove(
-                            pending
-                                .iter()
-                                .position(|index| index == connected_program)
-                                .unwrap(),
-                        );
+                        pending.remove(connected_program);
                     }
                 }
             }
@@ -94,6 +90,17 @@ mod part_2 {
         }
 
         amount_groups
+    }
+
+    fn take_arbitrary<T>(set: &mut HashSet<T>) -> Option<T>
+    where
+        T: Clone + Copy + Eq + Hash,
+    {
+        let item = set.iter().next().cloned();
+        item?;
+        let pending_program = item.unwrap();
+        set.remove(&pending_program);
+        Some(pending_program)
     }
 
     #[cfg(test)]
