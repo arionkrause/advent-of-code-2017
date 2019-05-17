@@ -111,26 +111,22 @@ mod part_2 {
         for index in 0..128 {
             let hash_input = format!("{}-{}", input, index);
             let knot_hash = get_knot_hash(&hash_input);
-            let mut row = Vec::new();
 
-            for character in knot_hash.chars() {
-                let character_in_binary = format!("{:04b}", character.to_digit(32).unwrap());
-
-                for digit in character_in_binary.chars() {
-                    row.push(Square {
+            grid.push(
+                format!("{:0128b}", u128::from_str_radix(&knot_hash, 16).unwrap())
+                    .chars()
+                    .map(|digit| Square {
                         used: digit == '1',
                         processed: false,
-                    });
-                }
-            }
-
-            grid.push(row);
+                    })
+                    .collect(),
+            );
         }
 
         let mut amount_regions = 0;
 
-        for y in 0..128 {
-            for x in 0..128 {
+        for y in 0..grid.len() {
+            for x in 0..grid[0].len() {
                 if !grid[y][x].processed && grid[y][x].used {
                     amount_regions += 1;
                     process_region(&mut grid, y, x);
