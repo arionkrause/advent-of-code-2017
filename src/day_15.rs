@@ -35,10 +35,10 @@ mod part_1 {
         let mut amount_matches = 0;
 
         for _ in 0..40_000_000 {
-            value_a = value_a * 16807 % 2_147_483_647;
-            value_b = value_b * 48271 % 2_147_483_647;
+            value_a = value_a * 16807 % 0x7FFF_FFFF;
+            value_b = value_b * 48271 % 0x7FFF_FFFF;
 
-            if value_a & 0b1111_1111_1111_1111 == value_b & 0b1111_1111_1111_1111 {
+            if value_a & 0xFFFF == value_b & 0xFFFF {
                 amount_matches += 1;
             }
         }
@@ -67,7 +67,7 @@ mod part_2 {
             value_a = get_next_value(value_a, 16807, 4);
             value_b = get_next_value(value_b, 48271, 8);
 
-            if value_a & 0b1111_1111_1111_1111 == value_b & 0b1111_1111_1111_1111 {
+            if value_a & 0xFFFF == value_b & 0xFFFF {
                 amount_matches += 1;
             }
         }
@@ -79,7 +79,7 @@ mod part_2 {
         let mut new_value = current_value;
 
         loop {
-            new_value = new_value * factor % 2_147_483_647;
+            new_value = new_value * factor % 0x7FFF_FFFF;
 
             if new_value % multiple_of == 0 {
                 return new_value;
