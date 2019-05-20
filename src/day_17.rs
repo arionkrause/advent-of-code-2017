@@ -1,5 +1,4 @@
 use super::print_day;
-use std::collections::vec_deque::VecDeque;
 
 pub fn solve(input: &str) {
     print_day!(file!());
@@ -8,16 +7,7 @@ pub fn solve(input: &str) {
     println!();
 }
 
-fn rotate_right(deque: &mut VecDeque<usize>, amount: usize) {
-    for _ in 0..amount {
-        if let Some(popped) = deque.pop_back() {
-            deque.push_front(popped);
-        }
-    }
-}
-
 mod part_1 {
-    use crate::day_17::rotate_right;
     use std::collections::vec_deque::VecDeque;
 
     pub fn solve(input: &str) -> usize {
@@ -35,6 +25,14 @@ mod part_1 {
         circular_buffer.pop_front().unwrap()
     }
 
+    fn rotate_right(deque: &mut VecDeque<usize>, amount: usize) {
+        for _ in 0..amount {
+            if let Some(popped) = deque.pop_back() {
+                deque.push_front(popped);
+            }
+        }
+    }
+
     #[cfg(test)]
     #[test]
     fn test_1() {
@@ -43,25 +41,19 @@ mod part_1 {
 }
 
 mod part_2 {
-    use crate::day_17::rotate_right;
-    use std::collections::vec_deque::VecDeque;
-
     pub fn solve(input: &str) -> usize {
         let amount_steps_per_insert: usize = input.parse().unwrap();
-        let mut circular_buffer = VecDeque::new();
-        circular_buffer.push_front(0);
-        circular_buffer.push_front(1);
+        let mut position = 0;
+        let mut value_after_0 = None;
 
-        for number in 2..=50_000_000 {
-            rotate_right(&mut circular_buffer, amount_steps_per_insert);
-            circular_buffer.push_front(number);
+        for number in 1..=50_000_000 {
+            position = (position + amount_steps_per_insert) % number + 1;
+
+            if position == 1 {
+                value_after_0 = Some(number);
+            }
         }
 
-        let position = circular_buffer
-            .iter()
-            .position(|number| *number == 0)
-            .unwrap();
-
-        circular_buffer[position - 1]
+        value_after_0.unwrap()
     }
 }
