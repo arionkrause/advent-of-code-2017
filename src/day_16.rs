@@ -69,6 +69,8 @@ fn dance(input: &str, programs_input: &str, repetitions: usize) -> String {
                 programs.swap(position_a, position_b);
                 continue;
             }
+
+            panic!();
         }
 
         if states.contains_key(&programs) {
