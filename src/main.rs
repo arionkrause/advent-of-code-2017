@@ -14,6 +14,7 @@ mod day_15;
 mod day_16;
 mod day_17;
 mod day_18;
+mod day_19;
 mod day_2;
 mod day_3;
 mod day_4;
@@ -22,7 +23,6 @@ mod day_6;
 mod day_7;
 mod day_8;
 mod day_9;
-//mod day_19;
 //mod day_20;
 //mod day_21;
 //mod day_22;
@@ -119,10 +119,10 @@ fn main() -> Result<(), Error> {
         day_18::solve(&read_file("day_18")?);
     }
 
-    //    if run_all || &arguments[1] == "day_19" {
-    //        day_19::solve(&read_file("day_19")?);
-    //    }
-    //
+    if run_all || &arguments[1] == "day_19" {
+        day_19::solve(&read_file("day_19")?);
+    }
+
     //    if run_all || &arguments[1] == "day_20" {
     //        day_20::solve(&read_file("day_20")?);
     //    }
