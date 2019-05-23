@@ -5,6 +5,7 @@ use regex::Regex;
 pub fn solve(input: &str) {
     print_day!(file!());
     println!("Part 1: {}.", part_1::solve(&input, 5, false));
+    println!("Part 2: {}.", part_2::solve(&input, 18, false));
     println!();
 }
 
@@ -238,155 +239,159 @@ fn decode_input(input: &str) -> (Vec<Rule2By2>, Vec<Rule3By3>) {
     (rules_2_by_2, rules_3_by_3)
 }
 
-mod part_1 {
-    use crate::day_21::decode_input;
+fn run(input: &str, amount_iterations: usize, print_status: bool) -> usize {
+    let (rules_2_by_2, rules_3_by_3) = decode_input(&input);
+    let mut grid = vec!['.', '#', '.', '.', '.', '#', '#', '#', '#'];
 
-    pub fn solve(input: &str, amount_iterations: usize, print_status: bool) -> usize {
-        let (rules_2_by_2, rules_3_by_3) = decode_input(&input);
-        let mut grid = vec!['.', '#', '.', '.', '.', '#', '#', '#', '#'];
-
-        for _ in 0..amount_iterations {
-            if print_status {
-                print_grid(&grid);
-            }
-
-            if grid.len() % 2 == 0 {
-                let mut new_blocks = Vec::new();
-
-                for block in get_blocks_2_by_2(&grid) {
-                    for rule in &rules_2_by_2 {
-                        if rule.matches(&block) {
-                            new_blocks.push(rule.to.clone());
-                            continue;
-                        }
-                    }
-                }
-
-                grid = build_3_by_3_grid(&new_blocks);
-            } else {
-                let mut new_blocks = Vec::new();
-
-                for block in get_blocks_3_by_3(&grid) {
-                    for rule in &rules_3_by_3 {
-                        if rule.matches(&block) {
-                            new_blocks.push(rule.to.clone());
-                            continue;
-                        }
-                    }
-                }
-
-                grid = build_4_by_4_grid(&new_blocks);
-            }
-        }
-
+    for _ in 0..amount_iterations {
         if print_status {
             print_grid(&grid);
         }
 
-        grid.iter().filter(|&tile| *tile == '#').count()
+        if grid.len() % 2 == 0 {
+            let mut new_blocks = Vec::new();
+
+            for block in get_blocks_2_by_2(&grid) {
+                for rule in &rules_2_by_2 {
+                    if rule.matches(&block) {
+                        new_blocks.push(rule.to.clone());
+                        continue;
+                    }
+                }
+            }
+
+            grid = build_3_by_3_grid(&new_blocks);
+        } else {
+            let mut new_blocks = Vec::new();
+
+            for block in get_blocks_3_by_3(&grid) {
+                for rule in &rules_3_by_3 {
+                    if rule.matches(&block) {
+                        new_blocks.push(rule.to.clone());
+                        continue;
+                    }
+                }
+            }
+
+            grid = build_4_by_4_grid(&new_blocks);
+        }
     }
 
-    fn get_blocks_2_by_2(grid: &[char]) -> Vec<Vec<char>> {
-        let mut blocks = Vec::new();
-        let side_size = ((grid.len() / 4) as f32).sqrt() as usize;
+    if print_status {
+        print_grid(&grid);
+    }
 
-        for y in 0..side_size {
+    grid.iter().filter(|&tile| *tile == '#').count()
+}
+
+fn get_blocks_2_by_2(grid: &[char]) -> Vec<Vec<char>> {
+    let mut blocks = Vec::new();
+    let side_size = ((grid.len() / 4) as f32).sqrt() as usize;
+
+    for y in 0..side_size {
+        for x in 0..side_size {
+            blocks.push(vec![
+                grid[y * side_size * 4 + x * 2],
+                grid[y * side_size * 4 + x * 2 + 1],
+                grid[y * side_size * 4 + x * 2 + side_size * 2],
+                grid[y * side_size * 4 + x * 2 + side_size * 2 + 1],
+            ]);
+        }
+    }
+
+    blocks
+}
+
+fn get_blocks_3_by_3(grid: &[char]) -> Vec<Vec<char>> {
+    let mut blocks = Vec::new();
+    let side_size = ((grid.len() / 9) as f32).sqrt() as usize;
+
+    for y in 0..side_size {
+        for x in 0..side_size {
+            blocks.push(vec![
+                grid[y * side_size * 9 + x * 3],
+                grid[y * side_size * 9 + x * 3 + 1],
+                grid[y * side_size * 9 + x * 3 + 2],
+                grid[y * side_size * 9 + x * 3 + side_size * 3],
+                grid[y * side_size * 9 + x * 3 + side_size * 3 + 1],
+                grid[y * side_size * 9 + x * 3 + side_size * 3 + 2],
+                grid[y * side_size * 9 + x * 3 + side_size * 3 * 2],
+                grid[y * side_size * 9 + x * 3 + side_size * 3 * 2 + 1],
+                grid[y * side_size * 9 + x * 3 + side_size * 3 * 2 + 2],
+            ]);
+        }
+    }
+
+    blocks
+}
+
+fn build_4_by_4_grid(blocks: &[Vec<char>]) -> Vec<char> {
+    let mut grid = Vec::new();
+    let side_size = (blocks.len() as f32).sqrt() as usize;
+
+    for y in 0..side_size {
+        for row in 0..4 {
             for x in 0..side_size {
-                blocks.push(vec![
-                    grid[y * side_size * 4 + x * 2],
-                    grid[y * side_size * 4 + x * 2 + 1],
-                    grid[y * side_size * 4 + x * 2 + side_size * 2],
-                    grid[y * side_size * 4 + x * 2 + side_size * 2 + 1],
-                ]);
+                grid.push(blocks[y * side_size + x][row * 4]);
+                grid.push(blocks[y * side_size + x][row * 4 + 1]);
+                grid.push(blocks[y * side_size + x][row * 4 + 2]);
+                grid.push(blocks[y * side_size + x][row * 4 + 3]);
             }
         }
-
-        blocks
     }
 
-    fn get_blocks_3_by_3(grid: &[char]) -> Vec<Vec<char>> {
-        let mut blocks = Vec::new();
+    grid
+}
+
+fn build_3_by_3_grid(blocks: &[Vec<char>]) -> Vec<char> {
+    let mut grid = Vec::new();
+    let side_size = (blocks.len() as f32).sqrt() as usize;
+
+    for y in 0..side_size {
+        for row in 0..3 {
+            for x in 0..side_size {
+                grid.push(blocks[y * side_size + x][row * 3]);
+                grid.push(blocks[y * side_size + x][row * 3 + 1]);
+                grid.push(blocks[y * side_size + x][row * 3 + 2]);
+            }
+        }
+    }
+
+    grid
+}
+
+fn print_grid(grid: &[char]) {
+    if grid.len() % 2 == 0 {
+        let side_size = ((grid.len() / 4) as f32).sqrt() as usize;
+        eprintln!("grid = {:?}", grid);
+        for (index, tile) in grid.iter().enumerate() {
+            if index > 0 && index % (side_size * 2) == 0 {
+                eprintln!();
+            }
+
+            eprint!("{}", tile);
+        }
+    } else {
         let side_size = ((grid.len() / 9) as f32).sqrt() as usize;
 
-        for y in 0..side_size {
-            for x in 0..side_size {
-                blocks.push(vec![
-                    grid[y * side_size * 9 + x * 3],
-                    grid[y * side_size * 9 + x * 3 + 1],
-                    grid[y * side_size * 9 + x * 3 + 2],
-                    grid[y * side_size * 9 + x * 3 + side_size * 3],
-                    grid[y * side_size * 9 + x * 3 + side_size * 3 + 1],
-                    grid[y * side_size * 9 + x * 3 + side_size * 3 + 2],
-                    grid[y * side_size * 9 + x * 3 + side_size * 3 * 2],
-                    grid[y * side_size * 9 + x * 3 + side_size * 3 * 2 + 1],
-                    grid[y * side_size * 9 + x * 3 + side_size * 3 * 2 + 2],
-                ]);
+        for (index, tile) in grid.iter().enumerate() {
+            if index > 0 && index % (side_size * 3) == 0 {
+                eprintln!();
             }
-        }
 
-        blocks
+            eprint!("{}", tile);
+        }
     }
 
-    fn build_4_by_4_grid(blocks: &[Vec<char>]) -> Vec<char> {
-        let mut grid = Vec::new();
-        let side_size = (blocks.len() as f32).sqrt() as usize;
+    eprintln!();
+    eprintln!();
+}
 
-        for y in 0..side_size {
-            for row in 0..4 {
-                for x in 0..side_size {
-                    grid.push(blocks[y * side_size + x][row * 4]);
-                    grid.push(blocks[y * side_size + x][row * 4 + 1]);
-                    grid.push(blocks[y * side_size + x][row * 4 + 2]);
-                    grid.push(blocks[y * side_size + x][row * 4 + 3]);
-                }
-            }
-        }
+mod part_1 {
+    use crate::day_21::run;
 
-        grid
-    }
-
-    fn build_3_by_3_grid(blocks: &[Vec<char>]) -> Vec<char> {
-        let mut grid = Vec::new();
-        let side_size = (blocks.len() as f32).sqrt() as usize;
-
-        for y in 0..side_size {
-            for row in 0..3 {
-                for x in 0..side_size {
-                    grid.push(blocks[y * side_size + x][row * 3]);
-                    grid.push(blocks[y * side_size + x][row * 3 + 1]);
-                    grid.push(blocks[y * side_size + x][row * 3 + 2]);
-                }
-            }
-        }
-
-        grid
-    }
-
-    fn print_grid(grid: &[char]) {
-        if grid.len() % 2 == 0 {
-            let side_size = ((grid.len() / 4) as f32).sqrt() as usize;
-            eprintln!("grid = {:?}", grid);
-            for (index, tile) in grid.iter().enumerate() {
-                if index > 0 && index % (side_size * 2) == 0 {
-                    eprintln!();
-                }
-
-                eprint!("{}", tile);
-            }
-        } else {
-            let side_size = ((grid.len() / 9) as f32).sqrt() as usize;
-
-            for (index, tile) in grid.iter().enumerate() {
-                if index > 0 && index % (side_size * 3) == 0 {
-                    eprintln!();
-                }
-
-                eprint!("{}", tile);
-            }
-        }
-
-        eprintln!();
-        eprintln!();
+    pub fn solve(input: &str, amount_iterations: usize, print_status: bool) -> usize {
+        run(&input, amount_iterations, print_status)
     }
 
     #[cfg(test)]
@@ -396,5 +401,13 @@ mod part_1 {
 .#./..#/### => #..#/..../..../#..#";
 
         assert_eq!(solve(input, 2, true), 12);
+    }
+}
+
+mod part_2 {
+    use crate::day_21::run;
+
+    pub fn solve(input: &str, amount_iterations: usize, print_status: bool) -> usize {
+        run(&input, amount_iterations, print_status)
     }
 }
