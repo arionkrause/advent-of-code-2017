@@ -4,6 +4,7 @@ use regex::Regex;
 pub fn solve(input: &str) {
     print_day!(file!());
     println!("Part 1: {}.", part_1::solve(&input));
+    println!("Part 2: {}.", part_2::solve(&input));
     println!();
 }
 
@@ -346,5 +347,52 @@ mod part_1 {
         }
 
         amount_times_mul_invoked
+    }
+}
+
+mod part_2 {
+    use regex::Regex;
+
+    pub fn solve(input: &str) -> usize {
+        let re = Regex::new(r"^set b (?P<value_b>\d+)").unwrap();
+
+        let low = re
+            .captures(&input)
+            .unwrap()
+            .name("value_b")
+            .unwrap()
+            .as_str()
+            .parse::<usize>()
+            .unwrap()
+            * 100
+            + 100_000;
+
+        let high = low + 17000;
+
+        (low..=high)
+            .step_by(17)
+            .filter(|&number| !is_prime(number))
+            .count()
+    }
+
+    // Powered by: https://en.wikipedia.org/wiki/Primality_test#Pseudocode
+    fn is_prime(number: usize) -> bool {
+        if number <= 3 {
+            return number > 1;
+        } else if number % 2 == 0 || number % 3 == 0 {
+            return false;
+        }
+
+        let mut i = 5;
+
+        while i * i <= number {
+            if number % i == 0 || number % (i + 2) == 0 {
+                return false;
+            }
+
+            i += 6;
+        }
+
+        true
     }
 }
