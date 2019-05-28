@@ -21,6 +21,7 @@ mod day_21;
 mod day_22;
 mod day_23;
 mod day_24;
+mod day_25;
 mod day_3;
 mod day_4;
 mod day_5;
@@ -28,7 +29,6 @@ mod day_6;
 mod day_7;
 mod day_8;
 mod day_9;
-//mod day_25;
 
 fn main() -> Result<(), Error> {
     println!("Advent of code 2017.");
@@ -143,9 +143,9 @@ fn main() -> Result<(), Error> {
         day_24::solve(&read_file("day_24")?);
     }
 
-    //    if run_all || &arguments[1] == "day_25" {
-    //        day_25::solve(&read_file("day_25")?);
-    //    }
+    if run_all || &arguments[1] == "day_25" {
+        day_25::solve(&read_file("day_25")?);
+    }
 
     let after = before.elapsed();
     println!(
